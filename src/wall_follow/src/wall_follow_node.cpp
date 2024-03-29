@@ -22,9 +22,9 @@ public:
 
 private:
     // PID CONTROL PARAMS
-    double kp = 3;
+    double kp = 4;
     double ki = 0;
-    double kd = 0.1;
+    double kd = 3;
     double servo_offset = 0.0;
     double prev_error = 0.0;
     double error = 0.0;
@@ -123,11 +123,11 @@ private:
         
         // We go slower if we need to a large steering angle correction
         if (std::abs(drive_msg.drive.steering_angle) >= this->to_radians(0) && std::abs(drive_msg.drive.steering_angle) < this->to_radians(10)) {
-            drive_msg.drive.speed = 1.5;
+            drive_msg.drive.speed = 2.5;
         } else if (std::abs(drive_msg.drive.steering_angle) >= this->to_radians(10) && std::abs(drive_msg.drive.steering_angle) < this->to_radians(20)) {
-            drive_msg.drive.speed = 1.0;
+            drive_msg.drive.speed = 2;
         } else {
-            drive_msg.drive.speed = 0.5;
+            drive_msg.drive.speed = 1.5;
         }
         this->publisher_->publish(drive_msg);
     }

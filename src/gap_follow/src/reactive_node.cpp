@@ -89,6 +89,7 @@ class ReactiveFollowGap : public rclcpp::Node {
         // Find max length gap
         std::pair<int, int> p;
         p = find_max_gap();
+        RCLCPP_INFO(this->get_logger(), "p.first: '%f' '%f", p.first, p.second);  // Output to log;
 
         // Find the best point in the gap
         double best_angle_i = find_best_point(p.first, p.second);
@@ -97,7 +98,7 @@ class ReactiveFollowGap : public rclcpp::Node {
         auto drive_msg = ackermann_msgs::msg::AckermannDriveStamped();
         // Fill in drive message and publish
         drive_msg.drive.steering_angle = scan_msg->angle_min + best_angle_i * scan_msg->angle_increment;
-        RCLCPP_INFO(this->get_logger(), "a: '%f'", drive_msg.drive.steering_angle);  // Output to log;
+        // RCLCPP_INFO(this->get_logger(), "a: '%f'", drive_msg.drive.steering_angle);  // Output to log;
         // We go slower if we need to a large steering angle correction
         if (std::abs(drive_msg.drive.steering_angle) >= this->to_radians(0) && std::abs(drive_msg.drive.steering_angle) < this->to_radians(10)) {
             drive_msg.drive.speed = 1.5;
