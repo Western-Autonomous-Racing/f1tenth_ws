@@ -18,6 +18,7 @@ class WaypointGenerator : public rclcpp::Node {
 
     double x_old = 0;
     double y_old = 0;
+    double velocity_old = 0;
 
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr subscription_point;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_odom;

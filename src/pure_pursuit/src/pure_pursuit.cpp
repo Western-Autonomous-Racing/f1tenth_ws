@@ -25,7 +25,7 @@
 
 PurePursuit::PurePursuit() : Node("pure_pursuit_node") {
     // initialise parameters
-    this->declare_parameter("waypoints_path", "/sim_ws/src/pure_pursuit/racelines/e7_floor5.csv");
+    this->declare_parameter("waypoints_path", "/sim_ws/src/pure_pursuit/racelines/levine_blocked.csv");
     this->declare_parameter("odom_topic", "/ego_racecar/odom");
     this->declare_parameter("car_refFrame", "ego_racecar/base_link");
     this->declare_parameter("drive_topic", "/drive");
@@ -33,11 +33,11 @@ PurePursuit::PurePursuit() : Node("pure_pursuit_node") {
     this->declare_parameter("rviz_lookahead_waypoint_topic", "/lookahead_waypoint");
     this->declare_parameter("global_refFrame", "map");
     this->declare_parameter("min_lookahead", 0.3);
-    this->declare_parameter("max_lookahead", 0.8);
+    this->declare_parameter("max_lookahead", 1.8);
     this->declare_parameter("lookahead_ratio", 6.0);
     this->declare_parameter("K_p", 0.5);
     this->declare_parameter("steering_limit", 25.0);
-    this->declare_parameter("velocity_percentage", 0.3);
+    this->declare_parameter("velocity_percentage", 0.6);
 
     // Default Values
     waypoints_path = this->get_parameter("waypoints_path").as_string();
@@ -143,6 +143,8 @@ void PurePursuit::visualize_lookahead_point(Eigen::Vector3d &point) {
     marker.pose.position.x = point(0);
     marker.pose.position.y = point(1);
     marker.id = 1;
+    RCLCPP_INFO(this->get_logger(), "Lookahead Waypoint x position : %d", marker.pose.position.x);
+    RCLCPP_INFO(this->get_logger(), "Lookahead Waypoint y position : %d", marker.pose.position.y);
     vis_lookahead_point_pub->publish(marker);
 }
 
@@ -157,10 +159,11 @@ void PurePursuit::visualize_current_point(Eigen::Vector3d &point) {
     marker.scale.z = 0.25;
     marker.color.a = 1.0;
     marker.color.b = 1.0;
-
     marker.pose.position.x = point(0);
     marker.pose.position.y = point(1);
     marker.id = 1;
+    RCLCPP_INFO(this->get_logger(), "Current Waypoint x position : %d", marker.pose.position.x);
+    RCLCPP_INFO(this->get_logger(), "Current Waypoint y position : %d", marker.pose.position.y);
     vis_current_point_pub->publish(marker);
 }
 
@@ -241,9 +244,11 @@ void PurePursuit::transformandinterp_waypoint() {  // pass old waypoint here
     // initialise vectors
     waypoints.lookahead_point_world << waypoints.X[waypoints.index], waypoints.Y[waypoints.index], 0.0;
     waypoints.current_point_world << waypoints.X[waypoints.velocity_index], waypoints.Y[waypoints.velocity_index], 0.0;
-
+    RCLCPP_INFO(this->get_logger(), "Waypoint.lookahead_point_world: %d", waypoints.lookahead_point_world);
+    RCLCPP_INFO(this->get_logger(), "Waypoint.current_point_world: %d", waypoints.current_point_world);
     visualize_lookahead_point(waypoints.lookahead_point_world);
     visualize_current_point(waypoints.current_point_world);
+
 
     // look up transformation at that instant from tf_buffer_
     geometry_msgs::msg::TransformStamped transformStamped;
@@ -307,6 +312,8 @@ void PurePursuit::publish_message(double steering_angle) {
 void PurePursuit::odom_callback(const nav_msgs::msg::Odometry::ConstSharedPtr odom_submsgObj) {
     x_car_world = odom_submsgObj->pose.pose.position.x;
     y_car_world = odom_submsgObj->pose.pose.position.y;
+    RCLCPP_INFO(this->get_logger(), "X_car_world : %d", x_car_world);
+    RCLCPP_INFO(this->get_logger(), "Y_car_world : %d", y_car_world);
     // interpolate between different way-points
     get_waypoint();
 

@@ -1,6 +1,6 @@
 pure_pursuit:
   ros__parameters:
-    waypoints_path: "/sim_ws/src/pure_pursuit/racelines/levine.csv"
+    waypoints_path: "/sim_ws/src/pure_pursuit/racelines/levine_blocked_test.csv"
     odom_topic: "/ego_racecar/odom"
     car_refFrame: "ego_racecar/base_link"
     global_refFrame: "map"
@@ -19,4 +19,4 @@ pure_pursuit:
 
 waypoint_visualizer_node:
   ros__parameters:
-    waypoints_path: "/sim_ws/src/pure_pursuit/racelines/levine.csv"
+    waypoints_path: "/sim_ws/src/pure_pursuit/racelines/levine_blocked_test.csv"

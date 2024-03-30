@@ -22,9 +22,9 @@ public:
 
 private:
     // PID CONTROL PARAMS
-    double kp = 4;
+    double kp = 14;
     double ki = 0;
-    double kd = 3;
+    double kd = 0.9;
     double servo_offset = 0.0;
     double prev_error = 0.0;
     double error = 0.0;
@@ -54,7 +54,9 @@ private:
         Returns:
             range: range measurement in meters at the given angle
         */
-
+        // RCLCPP_INFO(this->get_logger(), "Max Angle: %f", to_degrees(scan_msg->angle_max));
+        // RCLCPP_INFO(this->get_logger(), "Min Angle: %f", to_degrees(scan_msg->angle_min));
+        // RCLCPP_INFO(this->get_logger(), "Theta Between: %f", scan_msg->angle_max -scan_msg->angle_min);
         assert(angle >= scan_msg->angle_min && angle <= scan_msg->angle_max); // Angle must be within range
         int i = (angle - scan_msg->angle_min) / (scan_msg->angle_increment); // index i of closest angle
         if (std::isnan(scan_msg->ranges[i]) || scan_msg->ranges[i] > scan_msg->range_max) return scan_msg->range_max; // In case of NaNs and infinity, just return the maximum of the scan message
@@ -83,16 +85,16 @@ private:
             error: calculated error
         */
 
-        double a = get_range(scan_msg, to_radians(-50.0));
-        double b = get_range(scan_msg, to_radians(-90.0)); // 0 degrees is in front of the card.
+        double a = get_range(scan_msg, to_radians(90));
+        double b = get_range(scan_msg, to_radians(50)); // 0 degrees is in front of the card.
         double theta = to_radians(40.0); // 90.0 - 50.0 = 40.0 degrees
         double alpha = std::atan((a * std::cos(theta) - b)/(a * std::sin(theta)));
         double D_t = b*std::cos(alpha);
-        // double D_t_1 =  D_t + dist * std::sin(alpha);
-
+        // double D_t_1 =  D_t + std::sin(alpha) * 2 * car_length;
+        RCLCPP_INFO(this->get_logger(), "Distance from the wall: %f", this->error);
         this->prev_error = this->error;
         this->error = dist - D_t;
-        this->integral += this->error;
+        this->integral += this->error*0.001;
         this->prev_t = this->curr_t;
         this->curr_t = (double) scan_msg->header.stamp.nanosec * (double)10e-9 + (double) scan_msg->header.stamp.sec;
         if (this->start_t == 0.0) {
@@ -115,20 +117,23 @@ private:
         double angle = 0.0;
         // Use kp, ki & kd to implement a PID controller
         if (this->prev_t == 0.0) return;
-        angle = this->kp * this->error + this->ki * this->integral * (this->curr_t - this->start_t) + this->kd * (this->error - this->prev_error)/(this->curr_t - this->prev_t);
+        // angle = this->kp * this->error + this->ki * this->integral * (this->curr_t - this->start_t) + this->kd * (this->error - this->prev_error)/(this->curr_t - this->prev_t);
+        angle = this->kp * this->error + this->ki * this->integral + this->kd * (this->error - this->prev_error)/0.001;
 
         auto drive_msg = ackermann_msgs::msg::AckermannDriveStamped();
         // Fill in drive message and publish
-        drive_msg.drive.steering_angle = angle;
+        RCLCPP_INFO(this->get_logger(), "Output Angle: %f", to_degrees(0-angle));
+        drive_msg.drive.steering_angle = 0-angle;
         
         // We go slower if we need to a large steering angle correction
         if (std::abs(drive_msg.drive.steering_angle) >= this->to_radians(0) && std::abs(drive_msg.drive.steering_angle) < this->to_radians(10)) {
-            drive_msg.drive.speed = 2.5;
-        } else if (std::abs(drive_msg.drive.steering_angle) >= this->to_radians(10) && std::abs(drive_msg.drive.steering_angle) < this->to_radians(20)) {
-            drive_msg.drive.speed = 2;
-        } else {
             drive_msg.drive.speed = 1.5;
+        } else if (std::abs(drive_msg.drive.steering_angle) >= this->to_radians(10) && std::abs(drive_msg.drive.steering_angle) < this->to_radians(20)) {
+            drive_msg.drive.speed = 1.0;
+        } else {
+            drive_msg.drive.speed = 0.5;
         }
+        RCLCPP_INFO(this->get_logger(), "Output Speed: %f", drive_msg.drive.speed);
         this->publisher_->publish(drive_msg);
     }
 
