@@ -25,19 +25,19 @@
 
 PurePursuit::PurePursuit() : Node("pure_pursuit_node") {
     // initialise parameters
-    this->declare_parameter("waypoints_path", "/sim_ws/src/pure_pursuit/racelines/levine_blocked.csv");
-    this->declare_parameter("odom_topic", "/ego_racecar/odom");
+    this->declare_parameter("waypoints_path", "/home/war/war-projects/f1tenth_ws/src/pure_pursuit/racelines/aceb2.csv");
+    this->declare_parameter("odom_topic", "/ego_racecar/odom"); // /ego_racecar/odom;
     this->declare_parameter("car_refFrame", "ego_racecar/base_link");
     this->declare_parameter("drive_topic", "/drive");
     this->declare_parameter("rviz_current_waypoint_topic", "/current_waypoint");
     this->declare_parameter("rviz_lookahead_waypoint_topic", "/lookahead_waypoint");
     this->declare_parameter("global_refFrame", "map");
     this->declare_parameter("min_lookahead", 0.3);
-    this->declare_parameter("max_lookahead", 1.8);
+    this->declare_parameter("max_lookahead", 1.0);
     this->declare_parameter("lookahead_ratio", 6.0);
     this->declare_parameter("K_p", 0.5);
     this->declare_parameter("steering_limit", 25.0);
-    this->declare_parameter("velocity_percentage", 0.6);
+    this->declare_parameter("velocity_percentage", 0.1);
 
     // Default Values
     waypoints_path = this->get_parameter("waypoints_path").as_string();

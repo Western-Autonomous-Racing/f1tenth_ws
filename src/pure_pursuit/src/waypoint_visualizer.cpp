@@ -18,7 +18,7 @@
 #include "visualization_msgs/msg/marker_array.hpp"
 
 WaypointVisualizer::WaypointVisualizer() : Node("waypoint_visualizer_node") {
-    this->declare_parameter("waypoints_path", "/sim_ws/src/pure_pursuit/racelines/levine_blocked.csv");
+    this->declare_parameter("waypoints_path", "/home/war/war-projects/f1tenth_ws/src/pure_pursuit/racelines/aceb.csv");
     this->declare_parameter("rviz_waypoints_topic", "/waypoints");
 
     waypoints_path = this->get_parameter("waypoints_path").as_string();

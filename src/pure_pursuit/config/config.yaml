@@ -1,6 +1,6 @@
 pure_pursuit:
   ros__parameters:
-    waypoints_path: "/f1tenth_ws/src/pure_pursuit/racelines/levine_blocked_test.csv"
+    waypoints_path: "/home/war/war-projects/f1tenth_ws/src/pure_pursuit/racelines/aceb.csv"
     odom_topic: "/pf/pose/odom"
     car_refFrame: "laser"
     global_refFrame: "map"
@@ -21,4 +21,4 @@ pure_pursuit:
 
 waypoint_visualizer_node:
   ros__parameters:
-    waypoints_path: "/f1tenth_ws/src/pure_pursuit/racelines/levine_blocked_test.csv"
+    waypoints_path: "/home/war/war-projects/f1tenth_ws/src/pure_pursuit/racelines/.csv"
